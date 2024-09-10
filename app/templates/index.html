@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>一覧画面</h1>
+<p>{{ message }}</p>
+
+<table border="1" style="border-collapse: collapse">
+    <tr>
+        <th>ID</th>
+        <th>ユーザー名</th>
+        <th>メールアドレス</th>
+    </tr>
+    {% for user in users %}
+        <tr>
+            <th>{{ user.id }}</th>
+            <th>{{ user.username }}</th>
+            <th>{{ user.email }}</th>
+        </tr>
+    {% endfor %}
+</table>
+
+<p><a href="/login">ログイン画面</a></p>
+<p><a href="/new">ユーザー登録画面</a></p>
+{% endblock %}
