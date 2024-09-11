@@ -22,11 +22,11 @@ with app.app_context():
     db.create_all()
 
 # ルートの定義
+# メニュー
 @app.route("/")
 def index():
-    message = "ユーザー一覧"
     users = User.query.all()
-    return render_template('index.html', message=message, users=users)
+    return render_template('index.html', users=users)
 
 @app.get('/login')
 def login_get():
@@ -46,6 +46,15 @@ def login_post():
         message = "ログインしました。"
         users = User.query.all()
         return render_template('index.html', message=message, users=users)
+
+@app.get('/password_reset')
+def password_reset_get():
+    return render_template('password_reset.html')
+
+@app.post('/password_reset')
+def password_reset_post():
+
+    return render_template('login.html')
 
 @app.get('/new')
 def new_get():
