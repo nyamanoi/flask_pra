@@ -1,27 +1,46 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>ユーザー登録画面</h1>
-<p>{{ message }}</p>
+<h1>新規登録</h1>
 
 <div>
     <form action="/new" method="post">
         <p>
-            <label for="username">username</label>
+            <label for="username">名前</label>
             <input type="text" id="username" name="username" required>
         </p>
         <p>
-            <label for="username">email</label>
-            <input type="text" id="email" name="email" required>
+            <label for="email">email</label>
+            <input type="email" id="email" name="email" required>
         </p>
-        <!-- <p>
-            <label for="password">password</label>
+        <p>
+            <label for="password">パスワード</label>
             <input type="password" id="password" name="password" required>
-        </p> -->
-        
+        </p>
+        <p>
+            <label for="gender">性別</label>
+            <input type="text" id="gender" name="gender">
+        </p>
+        <p>
+            <label for="post_code">郵便番号</label>
+            <input type="number" id="post_code" name="post_code" required>
+        </p>
+        <p>
+            <label for="address">住所</label>
+            <input type="text" id="address" name="address" required>
+        </p>
+        <p>
+            <label for="phone_number">電話番号</label>
+            <input type="tel" id="phone_number" name="phone_number" required>
+        </p>
+        <p>
+            <label for="license">取得資格</label>
+            <input type="text" id="license" name="license">
+        </p>
+
         <button type="submit">登録</button>
     </form>
 </div>
 
-<p><a href="/">一覧に戻る</a></p>
+<p><a href="/master">ユーザーマスタに戻る</a></p>
 {% endblock %}
