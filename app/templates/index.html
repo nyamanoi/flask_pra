@@ -3,21 +3,6 @@
 {% block content %}
 <h1>メニュー</h1>
 
-<table border="1" style="border-collapse: collapse">
-    <tr>
-        <th>ID</th>
-        <th>ユーザー名</th>
-        <th>メールアドレス</th>
-    </tr>
-    {% for user in users %}
-        <tr>
-            <th>{{ user.id }}</th>
-            <th>{{ user.username }}</th>
-            <th>{{ user.email }}</th>
-        </tr>
-    {% endfor %}
-</table>
+<p><a href="/master">ユーザーマスタ</a></p>
 
-<p><a href="/login">ログイン画面</a></p>
-<p><a href="/new">ユーザー登録画面</a></p>
 {% endblock %}

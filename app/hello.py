@@ -25,9 +25,9 @@ with app.app_context():
 # メニュー
 @app.route("/")
 def index():
-    users = User.query.all()
-    return render_template('index.html', users=users)
+    return render_template('index.html')
 
+# ログイン
 @app.get('/login')
 def login_get():
     return render_template('login.html')
@@ -47,6 +47,7 @@ def login_post():
         users = User.query.all()
         return render_template('index.html', message=message, users=users)
 
+# パスワードリセット
 @app.get('/password_reset')
 def password_reset_get():
     return render_template('password_reset.html')
@@ -56,6 +57,13 @@ def password_reset_post():
 
     return render_template('login.html')
 
+# ユーザーマスタ一覧
+@app.get("/master")
+def master_get():
+    users = User.query.all()
+    return render_template('master.html', users=users)
+
+# 新規登録
 @app.get('/new')
 def new_get():
     return render_template('new.html')

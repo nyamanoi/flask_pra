@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<p><a href="/new">新規登録</a></p>
+
+<table border="1" style="border-collapse: collapse">
+    <tr>
+        <th>ID</th>
+        <th>ユーザー名</th>
+        <th>メールアドレス</th>
+    </tr>
+    {% for user in users %}
+        <tr>
+            <th>{{ user.id }}</th>
+            <th>{{ user.username }}</th>
+            <th>{{ user.email }}</th>
+        </tr>
+    {% endfor %}
+</table>
+
+<p><a href="/">メニューに戻る</a></p>
+{% endblock %}
