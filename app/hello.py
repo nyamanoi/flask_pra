@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import psycopg2
 from psycopg2.extensions import connection
+from psycopg2.extras import DictCursor
 import random, string
 
 app = Flask(__name__)
@@ -12,12 +13,6 @@ def get_connection() -> connection:
 # 関数
 def randomname(n):
    return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
-
-def fetch_data_as_dict(cursor):
-    """カスタムキー名で辞書形式に変換する関数"""
-    columns = [desc[0] for desc in cursor.description]
-    rows = cursor.fetchall()
-    return [dict(zip(columns, row)) for row in rows]
 
 # ルートの定義
 # メニュー
@@ -59,9 +54,9 @@ def password_reset_post():
 @app.get("/master")
 def master_get():
     with get_connection() as conn:
-        with conn.cursor() as cur:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
             cur.execute('SELECT user_id, name, mail, created_at FROM users')
-            users = fetch_data_as_dict(cur)
+            users = cur.fetchall()
 
     return render_template('master.html', users=users)
 
@@ -85,8 +80,8 @@ def new_post():
 
     message = "ユーザー登録が完了しました。"
     with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute('SELECT * FROM users')
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            cur.execute('SELECT user_id, name, mail, created_at FROM users')
             users = cur.fetchall()
     return render_template('master.html', message=message, users=users)
 
@@ -94,7 +89,13 @@ def new_post():
 @app.get('/update/<id>')
 def update_get(id):
 
-    return render_template('update.html', id=id)
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            query = 'SELECT u.mail, u.name, u.password, ui.gender, ui.yubin, ui.jyusyo, ui.tel, us.shikaku_code FROM users AS u LEFT JOIN user_info AS ui ON u.user_id = ui.user_id LEFT JOIN user_shikaku AS us ON u.user_id = us.user_id WHERE u.user_id = %s'
+            cur.execute(query, (id,))
+            user = cur.fetchone()
+
+    return render_template('update.html', id=id, user=user)
 
 @app.post('/update/<id>')
 def update_post(id):

@@ -2,41 +2,42 @@
 
 {% block content %}
 <h1>ユーザー更新</h1>
-<p>id:{{id}}</p>
+<p>id: {{id}}</p>
+<p>user: {{ user }}</p>
 
 <div>
     <form action="/update/{{ id }}" method="post">
         <p>
-            <label for="username">名前</label>
-            <input type="text" id="username" name="username" required>
+            <label for="email">email</label>
+            <input type="email" id="email" name="email" value="{{ user.mail }}">
         </p>
         <p>
-            <label for="email">email</label>
-            <input type="email" id="email" name="email">
+            <label for="username">名前</label>
+            <input type="text" id="username" name="username" value="{{ user.name }}" required>
         </p>
         <p>
             <label for="password">パスワード</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="password" value="{{ user.password }}">
         </p>
         <p>
             <label for="gender">性別</label>
-            <input type="text" id="gender" name="gender">
+            <input type="text" id="gender" name="gender" value="{{ '' if not user.gender else user.gender }}">
         </p>
         <p>
             <label for="post_code">郵便番号</label>
-            <input type="number" id="post_code" name="post_code">
+            <input type="text" id="post_code" name="post_code" value="{{ '' if not user.yubin else user.gender }}">
         </p>
         <p>
             <label for="address">住所</label>
-            <input type="text" id="address" name="address">
+            <input type="text" id="address" name="address" value="{{ '' if not user.jyusyo else user.gender }}">
         </p>
         <p>
             <label for="phone_number">電話番号</label>
-            <input type="tel" id="phone_number" name="phone_number">
+            <input type="tel" id="phone_number" name="phone_number" value="{{ '' if not user.tel else user.gender }}">
         </p>
         <p>
             <label for="license">取得資格</label>
-            <input type="text" id="license" name="license">
+            <input type="text" id="license" name="license" value="{{ '' if not user.shikaku_code else user.gender }}">
         </p>
         <button type="submit" name="method" value="PUT" style="margin-right: 50px;">更新</button>
         <button type="submit" name="method" value="DELETE">削除</button>
