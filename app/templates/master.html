@@ -7,14 +7,18 @@
 <table border="1" style="border-collapse: collapse">
     <tr>
         <th>ID</th>
-        <th>ユーザー名</th>
-        <th>メールアドレス</th>
+        <th>氏名</th>
+        <th>e-mail</th>
+        <th>取得資格</th>
+        <th>登録日</th>
     </tr>
     {% for user in users %}
         <tr>
             <th>{{ user.id }}</th>
             <th>{{ user.username }}</th>
-            <th>{{ user.email }}</th>
+            <th><a href="/update/{{ user.id }}">{{ user.email }}</a></th>
+            <th></th>
+            <th></th>
         </tr>
     {% endfor %}
 </table>

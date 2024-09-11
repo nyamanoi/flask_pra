@@ -80,3 +80,18 @@ def new_post():
     message = "ユーザー登録が完了しました。"
     users = User.query.all()
     return render_template('index.html', message=message, users=users)
+
+# 更新、削除
+@app.get('/update/<id>')
+def update_get(id):
+
+    return render_template('update.html', id=id)
+
+@app.post('/update/<id>')
+def update_post(id):
+    if request.form['method'] == 'PUT':
+        return render_template('update.html', id='更新です')
+    elif request.form['method'] == 'DELETE':
+        return render_template('update.html', id='削除です')
+    else:
+        return render_template('update.html', id='例外エラーです')
