@@ -119,22 +119,23 @@ def update_post(id):
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
-        gender = request.form["gender"]
-        postCode = request.form["post_code"]
-        address = request.form["address"]
-        phoneNumber = request.form["phone_number"]
-        license = request.form["license"]
 
         with get_connection() as conn:
             with conn.cursor() as cur:
-                query = 'UPDATE users SET (user_id, name, mail, password, status) VALUES (%s, %s, %s, %s, %s)'
-                cur.execute(query, (userId, username, email, password, '有'))
+                query = 'UPDATE users SET name = %s, mail = %s, password = %s WHERE user_id = %s'
+                cur.execute(query, (username, email, password, id))
             conn.commit()
 
-        return render_template('update.html', id='更新です')
+        message = "ユーザーの更新が完了しました。"
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute('SELECT user_id, name, mail, created_at FROM users')
+                users = cur.fetchall()
+
+        return render_template('master.html', id=id, users=users, message=message)
 
     elif request.form['method'] == 'DELETE':
-        return render_template('update.html', id='削除です')
+        return render_template('master.html', id='削除です')
 
     else:
         return render_template('update.html', id='例外エラーです')
