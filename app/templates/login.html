@@ -2,17 +2,17 @@
 
 {% block content %}
 <h1>ログイン画面</h1>
-<p>{{ message }}</p>
+<p>message: {{ message }}</p>
 
 <div>
     <form action="/login" method="post">
         <p>
-            <label for="username">username</label>
-            <input type="text" id="username" name="username" value="{{ username }}" required>
+            <label for="username">email</label>
+            <input type="email" id="email" name="email" value="{{ email }}" required>
         </p>
         <p>
-            <label for="username">email</label>
-            <input type="text" id="email" name="email" value="{{ email }}" required>
+            <label for="username">password</label>
+            <input type="password" id="password" name="password" required>
         </p>
         <button type="submit">ログイン</button>
     </form>

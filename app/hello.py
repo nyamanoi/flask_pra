@@ -25,20 +25,47 @@ def index():
 def login_get():
     return render_template('login.html')
 
-# @app.post('/login')
-# def login_post():
-#     username = request.form["username"]
-#     email = request.form["email"]
+@app.post('/login')
+def login_post():
+    email = request.form["email"]
+    password = request.form["password"]
 
-#     loginUser = User.query.filter(User.username == username).filter(User.email == email).first()
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            query = 'SELECT * FROM users WHERE mail = %s AND password = %s'
+            cur.execute(query, (email, password))
+            loginUser = cur.fetchone()
 
-#     if not loginUser:
-#         message = "ログイン情報が間違っています。"
-#         return render_template('login.html', message=message, username=username, email=email)
-#     else:
-#         message = "ログインしました。"
-#         users = User.query.all()
-#         return render_template('index.html', message=message, users=users)
+    if loginUser:
+        message = "ログインしました。"
+        return render_template('index.html', message=message, loginUser=loginUser)
+    else:
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                query = 'SELECT * FROM users WHERE mail = %s'
+                cur.execute(query, (email,))
+                user = cur.fetchone()
+
+        if user:
+            if not user['lock_flag']:
+                lockFlag = '1'
+                message = "ログイン情報が間違っています。１回目"
+            elif user['lock_flag'] == '1':
+                lockFlag = '2'
+                message = "ログイン情報が間違っています。２回目"
+            elif user['lock_flag'] == '2':
+                lockFlag = '3'
+                message = "ロックされました。"
+
+            with get_connection() as conn:
+                with conn.cursor() as cur:
+                    query = 'UPDATE users SET lock_flag = %s WHERE mail = %s'
+                    cur.execute(query, (lockFlag, email))
+                conn.commit()
+        else:
+            message = "ログイン情報が間違っています。"
+
+        return render_template('login.html', message=message, email=email)
 
 # パスワードリセット
 @app.get('/password_reset')
