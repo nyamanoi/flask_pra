@@ -60,13 +60,14 @@ def master_get():
 
     return render_template('master.html', users=users)
 
-# 新規登録
+# 新規登録画面
 @app.get('/new')
 def new_get():
     return render_template('new.html')
 
 @app.post('/new')
 def new_post():
+    # 新規登録処理
     userId = randomname(6)
 
     username = request.form["username"]
@@ -101,7 +102,7 @@ def new_post():
 
     return render_template('master.html', message=message, users=users)
 
-# 更新、削除
+# 更新、削除画面
 @app.get('/update/<id>')
 def update_get(id):
 
@@ -115,6 +116,7 @@ def update_get(id):
 
 @app.post('/update/<id>')
 def update_post(id):
+    # 更新処理
     if request.form['method'] == 'PUT':
         username = request.form["username"]
         email = request.form["email"]
@@ -134,8 +136,26 @@ def update_post(id):
 
         return render_template('master.html', id=id, users=users, message=message)
 
+    # 削除処理
     elif request.form['method'] == 'DELETE':
-        return render_template('master.html', id='削除です')
+        email = request.form["email"]
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                query = 'DELETE FROM user_shikaku WHERE user_id = %s'
+                cur.execute(query, (id,))
+                query = 'DELETE FROM user_info WHERE user_id = %s'
+                cur.execute(query, (id,))
+                query = 'DELETE FROM users WHERE user_id = %s'
+                cur.execute(query, (id,))
+            conn.commit()
+
+        message = "ユーザーの削除が完了しました。"
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute('SELECT user_id, name, mail, created_at FROM users')
+                users = cur.fetchall()
+
+        return render_template('master.html', id=id, users=users, message=message)
 
     else:
         return render_template('update.html', id='例外エラーです')
