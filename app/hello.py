@@ -52,7 +52,7 @@ def login_post():
     if loginUser:
         session['login_user_mail'] = loginUser['mail']
         message = "ログインしました。"
-        return render_template('index.html', message=message, loginUser=loginUser)
+        return render_template('index.html', message=message)
     else:
         with get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -92,20 +92,28 @@ def logout_get():
 def password_reset_get():
     return render_template('password_reset.html')
 
-# @app.post('/password_reset')
-# def password_reset_post():
-#     password = request.form["password"]
-#     newPassword = request.form["new_password"]
+@app.post('/password_reset')
+def password_reset_post():
+    password = request.form["password"]
+    newPassword = request.form["new_password"]
 
-#     with get_connection() as conn:
-#         with conn.cursor(cursor_factory=DictCursor) as cur:
-#             query = 'SELECT * FROM users WHERE password = %s'
-#             cur.execute(query, (password,))
-#             user = cur.fetchone()
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            query = 'SELECT * FROM users WHERE password = %s'
+            cur.execute(query, (password,))
+            user = cur.fetchone()
 
-#     if not user:
-
-#     return render_template('login.html')
+    if user:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                query = 'UPDATE users SET password = %s WHERE mail = %s'
+                cur.execute(query, (newPassword, user['mail']))
+            conn.commit()
+        message = "パスワードを変更しました。"
+        return render_template('login.html', message=message)
+    else:
+        message = "現在のパスワードが違います。"
+        return render_template('password_reset.html', message=message)
 
 # ユーザーマスタ一覧
 @app.get("/master")
@@ -151,13 +159,11 @@ def new_post():
 # 更新、削除画面
 @app.get('/update/<id>')
 def update_get(id):
-
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
-            query = 'SELECT u.mail, u.name, u.password, ui.gender, ui.yubin, ui.jyusyo, ui.tel, us.shikaku_code FROM users AS u LEFT JOIN user_info AS ui ON u.user_id = ui.user_id LEFT JOIN user_shikaku AS us ON u.user_id = us.user_id WHERE u.user_id = %s'
+            query = 'SELECT mail, name, password FROM users WHERE user_id = %s'
             cur.execute(query, (id,))
             user = cur.fetchone()
-
     return render_template('update.html', id=id, user=user)
 
 @app.post('/update/<id>')
