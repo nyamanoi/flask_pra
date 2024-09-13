@@ -14,6 +14,12 @@ def get_connection() -> connection:
 def randomname(n):
    return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
 
+def userGetAll():
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            cur.execute('SELECT u.user_id, u.name, u.mail, s.shikaku_name, u.created_at FROM users AS u LEFT JOIN user_shikaku AS us ON u.user_id = us.user_id LEFT JOIN shikaku AS s ON us.shikaku_code = s.shikaku_code ORDER BY u.created_at ASC')
+            return cur.fetchall()
+
 # ルートの定義
 # メニュー
 @app.route("/")
@@ -72,19 +78,25 @@ def login_post():
 def password_reset_get():
     return render_template('password_reset.html')
 
-@app.post('/password_reset')
-def password_reset_post():
+# @app.post('/password_reset')
+# def password_reset_post():
+#     password = request.form["password"]
+#     newPassword = request.form["new_password"]
 
-    return render_template('login.html')
+#     with get_connection() as conn:
+#         with conn.cursor(cursor_factory=DictCursor) as cur:
+#             query = 'SELECT * FROM users WHERE password = %s'
+#             cur.execute(query, (password,))
+#             user = cur.fetchone()
+
+#     if not user:
+
+#     return render_template('login.html')
 
 # ユーザーマスタ一覧
 @app.get("/master")
 def master_get():
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute('SELECT user_id, name, mail, created_at FROM users')
-            users = cur.fetchall()
-
+    users = userGetAll()
     return render_template('master.html', users=users)
 
 # 新規登録画面
@@ -96,16 +108,13 @@ def new_get():
 def new_post():
     # 新規登録処理
     userId = randomname(6)
-
     username = request.form["username"]
     email = request.form["email"]
     password = request.form["password"]
-
     gender = request.form["gender"]
     postCode = request.form["post_code"]
     address = request.form["address"]
     phoneNumber = request.form["phone_number"]
-
     shikakuCode = randomname(2)
     license = request.form["license"]
 
@@ -122,11 +131,7 @@ def new_post():
         conn.commit()
 
     message = "ユーザー登録が完了しました。"
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute('SELECT user_id, name, mail, created_at FROM users')
-            users = cur.fetchall()
-
+    users = userGetAll()
     return render_template('master.html', message=message, users=users)
 
 # 更新、削除画面
@@ -156,11 +161,7 @@ def update_post(id):
             conn.commit()
 
         message = "ユーザーの更新が完了しました。"
-        with get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute('SELECT user_id, name, mail, created_at FROM users')
-                users = cur.fetchall()
-
+        users = userGetAll()
         return render_template('master.html', id=id, users=users, message=message)
 
     # 削除処理
@@ -177,12 +178,7 @@ def update_post(id):
             conn.commit()
 
         message = "ユーザーの削除が完了しました。"
-        with get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute('SELECT user_id, name, mail, created_at FROM users')
-                users = cur.fetchall()
-
+        users = userGetAll()
         return render_template('master.html', id=id, users=users, message=message)
-
     else:
         return render_template('update.html', id='例外エラーです')
