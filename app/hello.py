@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 import psycopg2
 from psycopg2.extensions import connection
 from psycopg2.extras import DictCursor
 import random, string
 
 app = Flask(__name__)
+app.secret_key = 'my_secret_key'
 
 # DB接続
 def get_connection() -> connection:
@@ -24,12 +25,18 @@ def userGetAll():
 # メニュー
 @app.route("/")
 def index():
-    return render_template('index.html')
+    if session.get('login_user_mail'):
+        return render_template('index.html')
+    else:
+        return redirect(url_for('login_get'))
 
 # ログイン
 @app.get('/login')
 def login_get():
-    return render_template('login.html')
+    if session.get('login_user_mail'):
+        return redirect(url_for('index'))
+    else:
+        return render_template('login.html')
 
 @app.post('/login')
 def login_post():
@@ -43,6 +50,7 @@ def login_post():
             loginUser = cur.fetchone()
 
     if loginUser:
+        session['login_user_mail'] = loginUser['mail']
         message = "ログインしました。"
         return render_template('index.html', message=message, loginUser=loginUser)
     else:
@@ -72,6 +80,12 @@ def login_post():
             message = "ログイン情報が間違っています。"
 
         return render_template('login.html', message=message, email=email)
+
+@app.get('/logout')
+def logout_get():
+    session.clear()
+    message = "ログアウトしました。"
+    return render_template('login.html', message=message)
 
 # パスワードリセット
 @app.get('/password_reset')
