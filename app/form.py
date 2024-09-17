@@ -12,18 +12,8 @@ class Form(FlaskForm):
         ],
         render_kw={"placeholder": "xxx@xxx.com"},
     )
-    name = StringField(
-        "名前",
-        validators=[
-            DataRequired(),
-        ],
-    )
-    password = PasswordField(
-        "パスワード",
-        validators=[
-            DataRequired(),
-        ],
-    )
+    name = StringField("名前", validators=[DataRequired()])
+    password = PasswordField("パスワード", validators=[DataRequired()])
     gender = RadioField(
         "性別", choices=[("男", "男"), ("女", "女")], validators=[Optional()]
     )
@@ -34,8 +24,7 @@ class Form(FlaskForm):
         "住所", validators=[Optional()], render_kw={"placeholder": "〇〇県〇〇市"}
     )
     phone_number = StringField(
-        "電話番号",
-        validators=[Optional()], render_kw={"placeholder": "000-000-0000"}
+        "電話番号", validators=[Optional()], render_kw={"placeholder": "000-000-0000"}
     )
     license = StringField("取得資格", validators=[Optional()])
 
