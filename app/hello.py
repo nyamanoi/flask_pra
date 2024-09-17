@@ -12,9 +12,7 @@ app.secret_key = "my_secret_key"
 
 # DB接続
 def get_connection() -> connection:
-    return psycopg2.connect(
-        "postgresql://postgres:ny88NY99@localhost:5432/testdb"
-    )
+    return psycopg2.connect("postgresql://postgres:ny88NY99@localhost:5432/testdb")
 
 
 # 関数
@@ -228,8 +226,6 @@ def new_post():
         shikakuCode = randomname(2)
         license = form.license.data
 
-        print("いいいいいいいいいいいいいい", gender)
-
         with get_connection() as conn:
             with conn.cursor() as cur:
                 query = """
@@ -243,8 +239,9 @@ def new_post():
                     INTO user_info(user_id, gender, yubin, jyusyo, tel, status)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """
-                cur.execute(query, (userId, gender, postCode,
-                            address, phoneNumber, "有"))
+                cur.execute(
+                    query, (userId, gender, postCode, address, phoneNumber, "有")
+                )
                 query = """
                     INSERT
                     INTO shikaku(shikaku_code, shikaku_name)
@@ -263,15 +260,14 @@ def new_post():
         users = userGetAll()
         return render_template("master.html", message=message, users=users)
     else:
-        errorMessage = '入力エラーがあります。'
-        return render_template(
-            'new.html', form=form, errorMessage=errorMessage
-        )
+        errorMessage = "入力エラーがあります。"
+        return render_template("new.html", form=form, errorMessage=errorMessage)
 
 
 # 更新、削除画面表示
 @app.get("/update/<id>")
 def update_get(id):
+    form = Form()
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
             query = """
@@ -286,7 +282,11 @@ def update_get(id):
             """
             cur.execute(query, (id,))
             user = cur.fetchone()
-    return render_template("update.html", id=id, user=user)
+
+    form.email.data = user["mail"]
+    form.name.data = user["name"]
+
+    return render_template("update.html", id=id, form=form)
 
 
 # 更新、削除処理
@@ -294,29 +294,33 @@ def update_get(id):
 def update_post(id):
     # 更新処理
     if request.form["method"] == "PUT":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        form = Form()
+        # バリデーションチェック
+        if form.validate_on_submit():
+            username = form.name.data
+            email = form.email.data
+            password = form.password.data
 
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                query = """
-                    UPDATE users
-                    SET
-                        name = %s
-                        , mail = %s
-                        , password = %s
-                    WHERE
-                        user_id = %s
-                """
-                cur.execute(query, (username, email, password, id))
-            conn.commit()
+            with get_connection() as conn:
+                with conn.cursor() as cur:
+                    query = """
+                        UPDATE users
+                        SET
+                            name = %s
+                            , mail = %s
+                            , password = %s
+                        WHERE
+                            user_id = %s
+                    """
+                    cur.execute(query, (username, email, password, id))
+                conn.commit()
 
-        message = "ユーザーの更新が完了しました。"
-        users = userGetAll()
-        return render_template(
-            "master.html", id=id, users=users, message=message
-        )
+            message = "ユーザーの更新が完了しました。"
+            users = userGetAll()
+            return render_template("master.html", id=id, users=users, message=message)
+        else:
+            message = "入力エラーがあります。"
+            return render_template("update.html", id=id, form=form, message=message)
 
     # 削除処理
     elif request.form["method"] == "DELETE":
@@ -350,8 +354,6 @@ def update_post(id):
 
         message = "ユーザーの削除が完了しました。"
         users = userGetAll()
-        return render_template(
-            "master.html", id=id, users=users, message=message
-        )
+        return render_template("master.html", id=id, users=users, message=message)
     else:
         return render_template("update.html", id="例外エラーです")
