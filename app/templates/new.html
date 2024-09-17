@@ -2,40 +2,71 @@
 
 {% block content %}
 <h1>新規登録</h1>
+<p>{{ errorMessage }}</p>
 
 <div>
     <form action="/new" method="POST">
+        {{ form.hidden_tag() }}
+
         <p>
-            <label for="email">e-mail</label>
-            <input type="email" id="email" name="email" required>
+            <label for="email">e-mail:</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
-            <label for="username">名前</label>
-            <input type="text" id="username" name="username" required>
+            <label for="username">名前:</label>
+            {{ form.name }}
+            {% for error in form.name.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
-            <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required>
+            <label for="password">パスワード:</label>
+            {{ form.password }}
+            {% for error in form.password.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
-            <label for="gender">性別</label>
-            <input type="text" id="gender" name="gender">
+            <label for="gender">性別:</label>
+            {% for subfield in form.gender %}
+                <label>
+                    {{ subfield() }} {{ subfield.label }}
+                </label>
+            {% endfor %}
+            {% for error in form.gender.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
             <label for="post_code">郵便番号</label>
-            <input type="text" id="post_code" name="post_code">
+            {{ form.post_code }}
+            {% for error in form.post_code.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
             <label for="address">住所</label>
-            <input type="text" id="address" name="address">
+            {{ form.address }}
+            {% for error in form.address.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
             <label for="phone_number">電話番号</label>
-            <input type="tel" id="phone_number" name="phone_number">
+            {{ form.phone_number }}
+            {% for error in form.phone_number.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
         <p>
             <label for="license">取得資格</label>
-            <input type="text" id="license" name="license">
+            {{ form.license }}
+            {% for error in form.license.errors %}
+                <span style="color: red">{{ error }}</span>
+            {% endfor %}
         </p>
 
         <button type="submit">登録</button>
