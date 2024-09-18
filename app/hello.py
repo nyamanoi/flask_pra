@@ -5,6 +5,7 @@ from psycopg2.extras import DictCursor
 import random
 import string
 from form import Form
+from models import User
 
 app = Flask(__name__)
 app.secret_key = "my_secret_key"
@@ -15,35 +16,13 @@ def get_connection() -> connection:
     return psycopg2.connect("postgresql://postgres:ny88NY99@localhost:5432/testdb")
 
 
+user = User.User()
+
+
 # 関数
 # id用のランダム値作成
 def randomname(n):
     return "".join(random.choices(string.ascii_letters + string.digits, k=n))
-
-
-# ユーザーマスタ一覧取得
-def userGetAll():
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(
-                """
-                SELECT
-                    u.user_id
-                    , u.name
-                    , u.mail
-                    , s.shikaku_name
-                    , u.created_at
-                FROM
-                    users AS u
-                    LEFT JOIN user_shikaku AS us
-                        ON u.user_id = us.user_id
-                    LEFT JOIN shikaku AS s
-                        ON us.shikaku_code = s.shikaku_code
-                ORDER BY
-                    u.created_at
-            """
-            )
-            return cur.fetchall()
 
 
 # ルートの定義
@@ -197,7 +176,7 @@ def password_reset_post():
 # ユーザーマスタ画面表示
 @app.get("/master")
 def master_get():
-    users = userGetAll()
+    users = user.userGetAll(get_connection())
     return render_template("master.html", users=users)
 
 
@@ -269,7 +248,7 @@ def new_post():
             conn.commit()
 
         message = "ユーザー登録が完了しました。"
-        users = userGetAll()
+        users = user.userGetAll(get_connection())
         return render_template("master.html", message=message, users=users)
     else:
         errorMessage = "入力エラーがあります。"
@@ -345,7 +324,7 @@ def update_post(id):
                 conn.commit()
 
             message = "ユーザーの更新が完了しました。"
-            users = userGetAll()
+            users = user.userGetAll(get_connection())
             return render_template("master.html", id=id, users=users, message=message)
         else:
             message = "入力エラーがあります。"
@@ -382,7 +361,7 @@ def update_post(id):
             conn.commit()
 
         message = "ユーザーの削除が完了しました。"
-        users = userGetAll()
+        users = user.userGetAll(get_connection())
         return render_template("master.html", id=id, users=users, message=message)
     else:
         return render_template("update.html", id="例外エラーです")
