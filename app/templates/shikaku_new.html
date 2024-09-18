@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>資格登録</h1>
+<p>{{ errorMessage }}</p>
+
+<div>
+    <form action="/shikaku_new" method="POST">
+        <p>
+            <label for="license">資格</label>
+            <input type="text" id="license" name="license">
+        </p>
+        <button type="submit">登録</button>
+    </form>
+</div>
+
+<p><a href="/">メニューに戻る</a></p>
+{% endblock %}

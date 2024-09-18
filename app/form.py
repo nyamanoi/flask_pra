@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, ValidationError, RadioField, PasswordField
+from wtforms import StringField, ValidationError, RadioField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, Optional
 
 
@@ -26,7 +26,9 @@ class Form(FlaskForm):
     phone_number = StringField(
         "電話番号", validators=[Optional()], render_kw={"placeholder": "000-000-0000"}
     )
-    license = StringField("取得資格", validators=[Optional()])
+    license = SelectField(
+        "取得資格", choices=[], validators=[Optional()], validate_choice=False
+    )
 
     def validate_email(self, email):
         if len(email.data) > 30:

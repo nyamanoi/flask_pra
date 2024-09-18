@@ -205,6 +205,25 @@ def master_get():
 @app.get("/new")
 def new_get():
     form = Form()
+    # 資格一覧取得
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            cur.execute(
+                """
+                SELECT
+                    shikaku_code
+                    , shikaku_name
+                FROM
+                    shikaku
+            """
+            )
+            shikakus = cur.fetchall()
+
+    # 資格一覧をセレクトボックスに格納
+    form.license.choices = [
+        (shikaku["shikaku_code"], shikaku["shikaku_name"]) for shikaku in shikakus
+    ]
+
     return render_template("new.html", form=form)
 
 
@@ -223,8 +242,7 @@ def new_post():
         postCode = form.post_code.data
         address = form.address.data
         phoneNumber = form.phone_number.data
-        shikakuCode = randomname(2)
-        license = form.license.data
+        shikakuCode = form.license.data
 
         with get_connection() as conn:
             with conn.cursor() as cur:
@@ -244,12 +262,6 @@ def new_post():
                 )
                 query = """
                     INSERT
-                    INTO shikaku(shikaku_code, shikaku_name)
-                    VALUES (%s, %s)
-                """
-                cur.execute(query, (shikakuCode, license))
-                query = """
-                    INSERT
                     INTO user_shikaku(user_id, shikaku_code)
                     VALUES (%s, %s)
                 """
@@ -261,6 +273,23 @@ def new_post():
         return render_template("master.html", message=message, users=users)
     else:
         errorMessage = "入力エラーがあります。"
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        shikaku_code
+                        , shikaku_name
+                    FROM
+                        shikaku
+                """
+                )
+                shikakus = cur.fetchall()
+
+        # 資格一覧をセレクトボックスに格納
+        form.license.choices = [
+            (shikaku["shikaku_code"], shikaku["shikaku_name"]) for shikaku in shikakus
+        ]
         return render_template("new.html", form=form, errorMessage=errorMessage)
 
 
@@ -357,3 +386,29 @@ def update_post(id):
         return render_template("master.html", id=id, users=users, message=message)
     else:
         return render_template("update.html", id="例外エラーです")
+
+
+# 資格登録画面表示
+@app.get("/shikaku_new")
+def shikaku_new_get():
+    return render_template("shikaku_new.html")
+
+
+# 新規登録処理
+@app.post("/shikaku_new")
+def shikaku_new_post():
+    shikakuCode = randomname(2)
+    shikakuName = request.form["license"]
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            query = """
+                INSERT
+                INTO shikaku(shikaku_code, shikaku_name)
+                VALUES (%s, %s)
+            """
+            cur.execute(query, (shikakuCode, shikakuName))
+        conn.commit()
+
+    message = "資格を登録しました。"
+    return render_template("index.html", message=message)
