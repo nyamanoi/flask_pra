@@ -18,7 +18,7 @@ def get_connection() -> connection:
     return psycopg2.connect("postgresql://postgres:ny88NY99@localhost:5432/testdb")
 
 
-user = User.User()
+userModel = User.User()
 
 
 # 関数
@@ -54,19 +54,7 @@ def login_post():
     email = request.form["email"]
     password = request.form["password"]
 
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            query = """
-                SELECT
-                    mail
-                FROM
-                    users
-                WHERE
-                    mail = %s
-                    AND password = %s
-            """
-            cur.execute(query, (email, password))
-            loginUserMail = cur.fetchone()
+    loginUserMail = userModel.getUserMail(get_connection(), email, password)
 
     # メアドとパスワードがあっている場合
     if loginUserMail is not None:
@@ -178,8 +166,8 @@ def password_reset_post():
 # ユーザーマスタ画面表示
 @app.get("/master")
 def master_get():
-    users = user.userGetAll(get_connection())
-    shikakus = user.getUserShikaku(get_connection())
+    users = userModel.userGetAll(get_connection())
+    shikakus = userModel.getUserShikaku(get_connection())
 
     # 取得したshikakusの形式を変更
     grouped_shikakus = defaultdict(list)
@@ -257,8 +245,8 @@ def new_post():
 
         # ユーザーマスタ一覧へ遷移
         message = "ユーザー登録が完了しました。"
-        users = user.userGetAll(get_connection())
-        shikakus = user.getUserShikaku(get_connection())
+        users = userModel.userGetAll(get_connection())
+        shikakus = userModel.getUserShikaku(get_connection())
         # 取得したshikakusの形式を変更
         grouped_shikakus = defaultdict(list)
         for shikaku in shikakus:
@@ -345,8 +333,8 @@ def update_post(id):
 
             # ユーザーマスタ一覧へ遷移
             message = "ユーザーの更新が完了しました。"
-            users = user.userGetAll(get_connection())
-            shikakus = user.getUserShikaku(get_connection())
+            users = userModel.userGetAll(get_connection())
+            shikakus = userModel.getUserShikaku(get_connection())
             # 取得したshikakusの形式を変更
             grouped_shikakus = defaultdict(list)
             for shikaku in shikakus:
@@ -394,8 +382,8 @@ def update_post(id):
 
         # ユーザーマスタ一覧へ遷移
         message = "ユーザーの削除が完了しました。"
-        users = user.userGetAll(get_connection())
-        shikakus = user.getUserShikaku(get_connection())
+        users = userModel.userGetAll(get_connection())
+        shikakus = userModel.getUserShikaku(get_connection())
         # 取得したshikakusの形式を変更
         grouped_shikakus = defaultdict(list)
         for shikaku in shikakus:

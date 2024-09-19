@@ -33,3 +33,18 @@ class User:
                             ON s.shikaku_code = us.shikaku_code
                 """)
                 return cur.fetchall()
+
+    def getUserMail(self, conn, email, password):
+        with conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                query = """
+                    SELECT
+                        mail
+                    FROM
+                        users
+                    WHERE
+                        mail = %s
+                        AND password = %s
+                """
+                cur.execute(query, (email, password))
+                return cur.fetchone()
