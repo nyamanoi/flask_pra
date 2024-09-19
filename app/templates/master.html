@@ -18,7 +18,7 @@
             <th>{{ user.user_id }}</th>
             <th>{{ user.name }}</th>
             <th><a href="/update/{{ user.user_id }}">{{ user.mail }}</a></th>
-            <th>{{ user.shikaku_name if user.shikaku_name else "" }}</th>
+            <th>{{ ", ".join(grouped_shikakus[user.user_id]) if grouped_shikakus[user.user_id] else "" }}</th>
             <th>{{ user.created_at }}</th>
         </tr>
     {% endfor %}

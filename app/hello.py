@@ -7,6 +7,7 @@ import random
 import string
 from form import Form
 from models import User
+from collections import defaultdict
 
 app = Flask(__name__)
 app.secret_key = "my_secret_key"
@@ -178,7 +179,16 @@ def password_reset_post():
 @app.get("/master")
 def master_get():
     users = user.userGetAll(get_connection())
-    return render_template("master.html", users=users)
+    shikakus = user.getUserShikaku(get_connection())
+
+    # 取得したshikakusの形式を変更
+    grouped_shikakus = defaultdict(list)
+    for shikaku in shikakus:
+        grouped_shikakus[shikaku["user_id"]].append(shikaku["shikaku_name"])
+
+    return render_template(
+        "master.html", users=users, grouped_shikakus=grouped_shikakus
+    )
 
 
 # 新規登録画面表示
@@ -245,9 +255,21 @@ def new_post():
                 extras.execute_values(cur, query, userShikaku_values)
             conn.commit()
 
+        # ユーザーマスタ一覧へ遷移
         message = "ユーザー登録が完了しました。"
         users = user.userGetAll(get_connection())
-        return render_template("master.html", message=message, users=users)
+        shikakus = user.getUserShikaku(get_connection())
+        # 取得したshikakusの形式を変更
+        grouped_shikakus = defaultdict(list)
+        for shikaku in shikakus:
+            grouped_shikakus[shikaku["user_id"]].append(shikaku["shikaku_name"])
+
+        return render_template(
+            "master.html",
+            message=message,
+            users=users,
+            grouped_shikakus=grouped_shikakus,
+        )
     else:
         errorMessage = "入力エラーがあります。"
         with get_connection() as conn:
@@ -321,9 +343,21 @@ def update_post(id):
                     cur.execute(query, (username, email, password, id))
                 conn.commit()
 
+            # ユーザーマスタ一覧へ遷移
             message = "ユーザーの更新が完了しました。"
             users = user.userGetAll(get_connection())
-            return render_template("master.html", id=id, users=users, message=message)
+            shikakus = user.getUserShikaku(get_connection())
+            # 取得したshikakusの形式を変更
+            grouped_shikakus = defaultdict(list)
+            for shikaku in shikakus:
+                grouped_shikakus[shikaku["user_id"]].append(shikaku["shikaku_name"])
+
+            return render_template(
+                "master.html",
+                users=users,
+                message=message,
+                grouped_shikakus=grouped_shikakus,
+            )
         else:
             message = "入力エラーがあります。"
             return render_template("update.html", id=id, form=form, message=message)
@@ -358,9 +392,21 @@ def update_post(id):
                 cur.execute(query, (id,))
             conn.commit()
 
+        # ユーザーマスタ一覧へ遷移
         message = "ユーザーの削除が完了しました。"
         users = user.userGetAll(get_connection())
-        return render_template("master.html", id=id, users=users, message=message)
+        shikakus = user.getUserShikaku(get_connection())
+        # 取得したshikakusの形式を変更
+        grouped_shikakus = defaultdict(list)
+        for shikaku in shikakus:
+            grouped_shikakus[shikaku["user_id"]].append(shikaku["shikaku_name"])
+
+        return render_template(
+            "master.html",
+            users=users,
+            message=message,
+            grouped_shikakus=grouped_shikakus,
+        )
     else:
         return render_template("update.html", id="例外エラーです")
 
