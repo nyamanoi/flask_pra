@@ -19,7 +19,7 @@
             <th>{{ user.name }}</th>
             <th><a href="/update/{{ user.user_id }}">{{ user.mail }}</a></th>
             <th>{{ ", ".join(grouped_shikakus[user.user_id]) if grouped_shikakus[user.user_id] else "" }}</th>
-            <th>{{ user.created_at }}</th>
+            <th>{{ user.created_at.strftime("%Y/%m/%d %H:%M") }}</th>
         </tr>
     {% endfor %}
 </table>
