@@ -1,5 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, ValidationError, RadioField, PasswordField, SelectField
+from wtforms import (
+    StringField,
+    ValidationError,
+    RadioField,
+    PasswordField,
+    SelectMultipleField
+)
 from wtforms.validators import DataRequired, Email, Optional
 
 
@@ -26,8 +32,11 @@ class Form(FlaskForm):
     phone_number = StringField(
         "電話番号", validators=[Optional()], render_kw={"placeholder": "000-000-0000"}
     )
-    license = SelectField(
-        "取得資格", choices=[], validators=[Optional()], validate_choice=False
+    licenses = SelectMultipleField(
+        "取得資格",
+        choices=[],
+        validators=[Optional()],
+        validate_choice=False,
     )
 
     def validate_email(self, email):
@@ -53,7 +62,3 @@ class Form(FlaskForm):
     def validate_phone_number(self, phone_number):
         if len(phone_number.data) > 12:
             raise ValidationError("12文字以内で入力してください。")
-
-    def validate_license(self, license):
-        if len(license.data) > 30:
-            raise ValidationError("30文字以内で入力してください。")

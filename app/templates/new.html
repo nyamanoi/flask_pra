@@ -63,9 +63,10 @@
         </p>
         <p>
             <label for="license">取得資格</label>
-            {{ form.license }}
-            {% for error in form.license.errors %}
-                <span style="color: red">{{ error }}</span>
+            <br>
+            {% for shikaku in shikakus %}
+                <input type="checkbox" name="license" value="{{ shikaku["shikaku_code"] }}" id="{{ shikaku["shikaku_code"] }}">
+                <label for="{{ shikaku["shikaku_code"] }}">{{ shikaku["shikaku_name"] }}</label>
             {% endfor %}
         </p>
 

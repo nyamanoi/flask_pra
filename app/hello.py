@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import psycopg2
+from psycopg2 import extras
 from psycopg2.extensions import connection
 from psycopg2.extras import DictCursor
 import random
@@ -198,12 +199,7 @@ def new_get():
             )
             shikakus = cur.fetchall()
 
-    # 資格一覧をセレクトボックスに格納
-    form.license.choices = [
-        (shikaku["shikaku_code"], shikaku["shikaku_name"]) for shikaku in shikakus
-    ]
-
-    return render_template("new.html", form=form)
+    return render_template("new.html", form=form, shikakus=shikakus)
 
 
 # 新規登録処理
@@ -221,7 +217,9 @@ def new_post():
         postCode = form.post_code.data
         address = form.address.data
         phoneNumber = form.phone_number.data
-        shikakuCode = form.license.data
+        shikakuCode = request.form.getlist("license")
+
+        userShikaku_values = [(userId, item) for item in shikakuCode]
 
         with get_connection() as conn:
             with conn.cursor() as cur:
@@ -242,9 +240,9 @@ def new_post():
                 query = """
                     INSERT
                     INTO user_shikaku(user_id, shikaku_code)
-                    VALUES (%s, %s)
+                    VALUES %s
                 """
-                cur.execute(query, (userId, shikakuCode))
+                extras.execute_values(cur, query, userShikaku_values)
             conn.commit()
 
         message = "ユーザー登録が完了しました。"
