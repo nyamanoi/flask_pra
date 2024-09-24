@@ -4,7 +4,7 @@ from wtforms import (
     ValidationError,
     RadioField,
     PasswordField,
-    SelectMultipleField
+    SelectMultipleField,
 )
 from wtforms.validators import DataRequired, Email, Optional
 

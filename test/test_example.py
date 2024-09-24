@@ -11,17 +11,20 @@ def test_subtraction():
 
 @pytest.fixture
 def sample_data():
-    return {'key': 'value'}
+    return {"key": "value"}
 
 
 def test_with_fixture(sample_data):
-    assert sample_data['key'] == 'value'
+    assert sample_data["key"] == "value"
 
 
-@pytest.mark.parametrize("input1, input2, expected", [
-    (1, 2, 3),
-    (2, 3, 5),
-    (3, 5, 8),
-])
+@pytest.mark.parametrize(
+    "input1, input2, expected",
+    [
+        (1, 2, 3),
+        (2, 3, 5),
+        (3, 5, 8),
+    ],
+)
 def test_addition(input1, input2, expected):
     assert input1 + input2 == expected
