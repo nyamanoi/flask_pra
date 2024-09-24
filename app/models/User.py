@@ -6,7 +6,8 @@ class User:
     def userGetAll(self, conn):
         with conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT
                         u.user_id
                         , u.name
@@ -16,14 +17,16 @@ class User:
                         users AS u
                     ORDER BY
                         u.created_at
-                """)
+                """
+                )
                 return cur.fetchall()
 
     # ユーザーが持つ資格を取得
     def getUserShikaku(self, conn):
         with conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT
                         us.user_id
                         , s.shikaku_name
@@ -31,7 +34,8 @@ class User:
                         user_shikaku AS us
                         LEFT JOIN shikaku AS s
                             ON s.shikaku_code = us.shikaku_code
-                """)
+                """
+                )
                 return cur.fetchall()
 
     def getUserMail(self, conn, email, password):
