@@ -32,9 +32,6 @@ class Form(FlaskForm):
     phone_number = StringField(
         "電話番号", validators=[Optional()], render_kw={"placeholder": "000-000-0000"}
     )
-
-
-        
     licenses = SelectMultipleField(
         "取得資格",
         choices=[],
@@ -45,9 +42,6 @@ class Form(FlaskForm):
     def validate_email(self, email):
         if len(email.data) > 30:
             raise ValidationError("30文字以内で入力してください。")
-
-
-
 
     def validate_name(self, name):
         if len(name.data) > 16:

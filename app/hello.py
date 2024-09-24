@@ -174,7 +174,9 @@ def master_get():
     for shikaku in shikakus:
         grouped_shikakus[shikaku["user_id"]].append(shikaku["shikaku_name"])
 
-    return render_template("master.html", users=users, grouped_shikakus=grouped_shikakus)
+    return render_template(
+        "master.html", users=users, grouped_shikakus=grouped_shikakus
+    )
 
 
 # 新規登録画面表示
